@@ -1,0 +1,1133 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SILKYSINGZ GEOAI | Gambia Reforestation Intelligence</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css">
+
+<style>
+:root {
+ --bg:#071511;
+ --panel:#10251e;
+ --panel2:#0a1b15;
+ --line:#294a3b;
+ --mint:#6be0b0;
+ --green:#36bd86;
+ --gold:#e9c875;
+ --pink:#e99ac0;
+ --text:#e8f4ee;
+ --muted:#9bb5a8;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;
+ background:radial-gradient(circle at top,#194331,#071511 55%);
+ color:var(--text);
+ font-family:Segoe UI,Arial,sans-serif;
+ font-size:13px;
+}
+header{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ padding:17px 22px;
+ border-bottom:1px solid var(--line);
+ background:#071511;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{
+ width:43px;height:43px;border-radius:13px;
+ display:grid;place-items:center;
+ background:linear-gradient(135deg,#69e0b0,#e9c875);
+ color:#071511;font-size:23px;font-weight:bold;
+}
+header h1{font-size:17px;letter-spacing:2px;margin:0}
+header p{font-size:10px;color:var(--muted);letter-spacing:2px;margin:4px 0 0}
+.tag{color:var(--mint);border:1px solid var(--line);padding:8px 12px;border-radius:20px;font-size:10px}
+main{max-width:1900px;margin:auto;padding:14px}
+.layout{
+ display:grid;
+ grid-template-columns:minmax(250px,.85fr) minmax(400px,1.5fr) minmax(270px,.9fr);
+ gap:13px;
+ align-items:stretch;
+}
+.panel{
+ background:linear-gradient(155deg,#11291f,#091a14);
+ border:1px solid var(--line);
+ border-radius:14px;
+ padding:14px;
+ min-width:0;
+}
+.panel h2{
+ color:var(--mint);
+ font-size:12px;
+ letter-spacing:1.5px;
+ margin:0 0 13px;
+}
+.section{border-top:1px solid var(--line);padding-top:12px;margin-top:13px}
+.section h3{color:var(--gold);font-size:10px;letter-spacing:1.3px;margin:0 0 9px;text-transform:uppercase}
+label{display:block;color:var(--muted);font-size:10px;margin:8px 0 4px}
+input,select{
+ width:100%;padding:9px;
+ background:#071711;color:var(--text);
+ border:1px solid #345443;border-radius:7px;
+ outline:none;
+}
+input:focus,select:focus{border-color:var(--mint)}
+input[type=checkbox]{width:auto;accent-color:var(--green)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.checks label{margin:3px 0}
+button{
+ cursor:pointer;border:0;border-radius:8px;padding:10px;
+ font-weight:700;font-size:11px;
+}
+.primary{background:linear-gradient(110deg,#56dba6,#c2e58b);color:#071b13}
+.secondary{background:#18392c;color:var(--text);border:1px solid #39614d}
+button:disabled{opacity:.5;cursor:wait}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.hint{font-size:10px;color:var(--muted);line-height:1.55}
+.status{
+ background:#071812;border:1px solid #294638;border-radius:8px;
+ padding:9px;color:var(--muted);font-size:10px;
+ min-height:42px;white-space:pre-wrap;
+}
+.maptools{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:9px}
+.maptools select{max-width:150px}
+.mapwrap{height:560px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+#map{height:100%;width:100%;background:#173329}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kpi{background:#081a14;border:1px solid #294638;border-radius:9px;padding:10px}
+.kpi span{display:block;font-size:9px;color:var(--muted)}
+.kpi strong{display:block;font-size:20px;color:var(--mint);margin-top:4px;overflow-wrap:anywhere}
+.chartbox{height:190px;position:relative}
+.tablewrap{max-height:190px;overflow:auto}
+table{border-collapse:collapse;width:100%;font-size:10px}
+th,td{padding:7px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--gold)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:9px;color:var(--muted);font-size:10px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.notice{border-left:3px solid var(--gold);background:#20251b;padding:9px;border-radius:4px;font-size:10px;color:#cbd7c9;margin-top:10px}
+footer{text-align:center;padding:20px;color:#789889;font-size:10px;line-height:1.8}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#10271f;color:white}
+@media(max-width:1100px){
+ .layout{grid-template-columns:1fr 1fr}
+ .center{grid-column:1/-1;grid-row:1}
+ .mapwrap{height:470px}
+}
+@media(max-width:700px){
+ header{align-items:flex-start}
+ .tag{display:none}
+ .layout{grid-template-columns:1fr}
+ .center,.left,.right{grid-column:1;grid-row:auto}
+ .mapwrap{height:410px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div class="brand">
+  <div class="logo">✿</div>
+  <div>
+   <h1>SILKYSINGZ GEOAI</h1>
+   <p>GAMBIA REFORESTATION INTELLIGENCE</p>
+  </div>
+ </div>
+ <div class="tag">SATELLITE • DRONE • HABITAT MONITORING</div>
+</header>
+
+<main>
+<div class="layout">
+
+<!-- LEFT: CONTROLS -->
+<section class="panel left">
+<h2>01 / STUDY CONTROLS</h2>
+
+<label>Restoration site name</label>
+<input id="siteName" value="Gambia Restoration Monitoring Site">
+
+<div class="row">
+ <div>
+  <label>Latitude</label>
+  <input id="lat" type="number" step=".0001" value="13.4549">
+ </div>
+ <div>
+  <label>Longitude</label>
+  <input id="lon" type="number" step=".0001" value="-16.5790">
+ </div>
+</div>
+
+<div class="row">
+ <div>
+  <label>Study radius (km)</label>
+  <input id="radius" type="number" min=".2" max="20" value="1">
+ </div>
+ <div>
+  <label>Planting year</label>
+  <input id="plantYear" type="number" value="2022">
+ </div>
+</div>
+
+<div class="row">
+ <div>
+  <label>Monitoring start</label>
+  <input id="start" type="date" value="2023-01-01">
+ </div>
+ <div>
+  <label>Monitoring end</label>
+  <input id="end" type="date" value="2026-11-12">
+ </div>
+</div>
+
+<label>Restoration category</label>
+<select id="habitat">
+ <option>Mangrove restoration</option>
+ <option>Community forest</option>
+ <option>Agroforestry</option>
+ <option>Coastal woodland</option>
+ <option>Dryland restoration</option>
+ <option>Other / mixed</option>
+</select>
+
+<div class="section">
+<h3>Satellite processing</h3>
+
+<div class="checks">
+ <label><input type="checkbox" id="cloudMask" checked> Cloud masking</label>
+ <label><input type="checkbox" id="useNDVI" checked> NDVI</label>
+ <label><input type="checkbox" id="useEVI"> EVI</label>
+ <label><input type="checkbox" id="useSAVI"> SAVI</label>
+</div>
+
+<label>Vegetation NDVI threshold</label>
+<input id="threshold" type="number" value=".35" min="0" max=".9" step=".05">
+
+<label>Maximum scene cloud cover (%)</label>
+<input id="cloud" type="number" value="35" min="0" max="100">
+
+<label>Maximum scenes</label>
+<select id="maxScenes">
+ <option>4</option>
+ <option selected>8</option>
+ <option>12</option>
+ <option>20</option>
+</select>
+
+<p class="hint">
+Satellite imagery is retrieved from Sentinel-2 L2A through Microsoft Planetary Computer. The application calculates vegetation indicators in the browser.
+</p>
+</div>
+
+<div class="section">
+<h3>Drone imagery and U-Net++</h3>
+
+<label>Upload drone images</label>
+<input id="droneFiles" type="file" accept="image/*" multiple>
+
+<label>Optional trained U-Net++ ONNX model</label>
+<input id="onnxFile" type="file" accept=".onnx">
+
+<label>Model input dimensions</label>
+<select id="modelSize">
+ <option>256</option>
+ <option selected>512</option>
+ <option>640</option>
+ <option>1024</option>
+</select>
+
+<p class="hint">
+A compatible ONNX model must have RGB input [1,3,H,W] and a single-channel probability output. Model-specific normalization must match the training workflow.
+</p>
+</div>
+
+<div class="actions">
+ <button class="primary" id="runBtn">RUN MONITORING</button>
+ <button class="secondary" id="resetBtn">RESET</button>
+</div>
+
+<div class="section">
+<h3>Processing status</h3>
+<div class="status" id="status">Ready. Define your restoration site and run monitoring.</div>
+</div>
+
+<div class="notice">
+NDVI measures vegetation response. It does not independently establish tree survival, tree counts, canopy height or biomass.
+</div>
+</section>
+
+<!-- CENTRE: MAP -->
+<section class="panel center">
+<h2>02 / INTERACTIVE SPATIAL VIEW</h2>
+
+<div class="maptools">
+ <span class="hint">Click map to reposition site. Draw a polygon or rectangle for a custom AOI.</span>
+ <select id="base">
+  <option value="satellite">Satellite</option>
+  <option value="street">Street</option>
+  <option value="terrain">Terrain</option>
+ </select>
+</div>
+
+<div class="mapwrap"><div id="map"></div></div>
+
+<div class="legend">
+ <span><i class="dot" style="background:#50d69a"></i>Vegetation</span>
+ <span><i class="dot" style="background:#e8c56c"></i>Low NDVI</span>
+ <span><i class="dot" style="background:#e77f78"></i>Bare / non-vegetated</span>
+ <span><i class="dot" style="background:#7db7ef"></i>Other valid pixels</span>
+</div>
+
+<div class="section">
+<h3>Selected site coordinates</h3>
+<div class="row">
+ <div class="kpi"><span>Latitude</span><strong id="siteLat">13.45490</strong></div>
+ <div class="kpi"><span>Longitude</span><strong id="siteLon">-16.57900</strong></div>
+</div>
+</div>
+</section>
+
+<!-- RIGHT: ANALYTICS -->
+<section class="panel right">
+<h2>03 / HABITAT ANALYTICS</h2>
+
+<div class="kpis">
+ <div class="kpi"><span>Scenes processed</span><strong id="sceneCount">0</strong></div>
+ <div class="kpi"><span>Latest mean NDVI</span><strong id="meanNdvi">—</strong></div>
+ <div class="kpi"><span>Vegetated area (ha)*</span><strong id="vegArea">—</strong></div>
+ <div class="kpi"><span>Vegetation pixels</span><strong id="vegPct">—</strong></div>
+ <div class="kpi"><span>NDVI change</span><strong id="ndviChange">—</strong></div>
+ <div class="kpi"><span>Scene cloud cover</span><strong id="cloudCover">—</strong></div>
+</div>
+
+<div class="section">
+<h3>Vegetation trajectory</h3>
+<div class="chartbox"><canvas id="trendChart"></canvas></div>
+</div>
+
+<div class="section">
+<h3>Latest vegetation classes</h3>
+<div class="chartbox"><canvas id="classChart"></canvas></div>
+</div>
+
+<div class="section">
+<h3>Satellite scene inventory</h3>
+<div class="tablewrap">
+<table>
+<thead>
+<tr><th>Date</th><th>Cloud %</th><th>NDVI</th><th>Vegetation %</th></tr>
+</thead>
+<tbody id="sceneRows">
+<tr><td colspan="4">No scenes processed yet.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section">
+<h3>Site interpretation</h3>
+<div class="status" id="interpretation">Run monitoring to generate the site-level summary.</div>
+</div>
+</section>
+
+<!-- BOTTOM -->
+<section class="panel" style="grid-column:1/-1">
+<h2>04 / METHODOLOGY AND EXPORTS</h2>
+
+<div class="row">
+<div>
+<h3>Processing workflow</h3>
+<p class="hint">
+1. Search Sentinel-2 L2A imagery intersecting the study site.
+<br>2. Retrieve signed public cloud-optimised GeoTIFF assets.
+<br>3. Read red, green, blue, NIR and scene-classification bands.
+<br>4. Mask cloud and shadow classes.
+<br>5. Calculate NDVI, EVI and SAVI indicators.
+<br>6. Calculate vegetation-pixel proportions and compare observations over time.
+<br>7. Optionally screen local drone imagery or load a compatible ONNX model.
+</p>
+</div>
+
+<div>
+<h3>Scientific validation</h3>
+<p class="hint">
+Vegetation increases may reflect natural regeneration, seasonal grasses, crops or planted trees. Reliable tree-survival assessment requires repeat field observations, georeferenced planting locations and independently validated image labels. A U-Net++ model must be trained and evaluated using representative Gambian drone or satellite imagery.
+</p>
+</div>
+</div>
+
+<div class="actions">
+<button class="secondary" id="csvBtn">EXPORT CSV</button>
+<button class="secondary" id="geoBtn">EXPORT AOI GEOJSON</button>
+<button class="secondary" id="jsonBtn">EXPORT PROJECT JSON</button>
+<button class="secondary" id="reportBtn">DOWNLOAD HTML REPORT</button>
+</div>
+
+<p class="hint">
+*Vegetated area is an approximate estimate based on the sampled raster window and nominal 10 m pixels. The first implementation uses the AOI bounding rectangle for raster sampling; a drawn polygon's exact interior is not yet used to mask pixels. Satellite imagery is accessed online; uploaded drone images are processed locally.
+</p>
+</section>
+
+</div>
+</main>
+
+<footer>
+Produced by Ansu Singhateh | GIS Analyst | GIS / Cartography Unit | Gambia Bureau of Statistics
+<br>SILKYSINGZ GEOAI • Research and educational use
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/geotiff@2.1.3/dist-browser/geotiff.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js"></script>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+const STAC = "https://planetarycomputer.microsoft.com/api/stac/v1";
+
+let map, circle, marker, drawnLayer;
+let results = [];
+let droneResults = [];
+let trendChart, classChart;
+let modelSession = null;
+
+const baseLayers = {
+ street: L.tileLayer(
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {maxZoom:19, attribution:"© OpenStreetMap"}
+ ),
+ satellite: L.tileLayer(
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  {maxZoom:19, attribution:"Esri"}
+ ),
+ terrain: L.tileLayer(
+  "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+  {maxZoom:17, attribution:"© OpenTopoMap"}
+ )
+};
+
+function log(message) {
+ $("status").textContent = new Date().toLocaleTimeString() + " — " + message;
+}
+
+function fmt(value, digits=3) {
+ return Number.isFinite(value) ? value.toFixed(digits) : "—";
+}
+
+function download(filename, content, type) {
+ const blob = new Blob([content], {type});
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement("a");
+ a.href = url;
+ a.download = filename;
+ a.click();
+ setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+function getAOI() {
+ const lat = Number($("lat").value);
+ const lon = Number($("lon").value);
+ const radius = Math.max(.2, Math.min(20, Number($("radius").value)));
+ const dy = radius / 111.32;
+ const dx = radius / (111.32 * Math.cos(lat * Math.PI / 180));
+
+ return {
+  type:"Polygon",
+  coordinates:[[
+   [lon-dx,lat-dy],
+   [lon+dx,lat-dy],
+   [lon+dx,lat+dy],
+   [lon-dx,lat+dy],
+   [lon-dx,lat-dy]
+  ]]
+ };
+}
+
+function updateSite() {
+ const lat = Number($("lat").value);
+ const lon = Number($("lon").value);
+ const radius = Number($("radius").value) * 1000;
+
+ if (!map || !Number.isFinite(lat) || !Number.isFinite(lon)) return;
+
+ if (circle) circle.setLatLng([lat,lon]).setRadius(radius);
+ else {
+  circle = L.circle([lat,lon], {
+   radius,
+   color:"#6be0b0",
+   weight:2,
+   fillColor:"#4acb91",
+   fillOpacity:.10
+  }).addTo(map);
+ }
+
+ if (marker) marker.setLatLng([lat,lon]);
+ else marker = L.marker([lat,lon]).addTo(map).bindPopup("Restoration monitoring site");
+
+ $("siteLat").textContent = lat.toFixed(5);
+ $("siteLon").textContent = lon.toFixed(5);
+}
+
+function initMap() {
+ map = L.map("map", {layers:[baseLayers.satellite]})
+  .setView([Number($("lat").value),Number($("lon").value)],13);
+
+ L.control.scale().addTo(map);
+ updateSite();
+
+ const drawn = new L.FeatureGroup().addTo(map);
+
+ map.addControl(new L.Control.Draw({
+  draw:{
+   polyline:false,
+   polygon:true,
+   rectangle:true,
+   circle:false,
+   marker:false,
+   circlemarker:false
+  },
+  edit:{featureGroup:drawn}
+ }));
+
+ map.on("click", e => {
+  $("lat").value = e.latlng.lat;
+  $("lon").value = e.latlng.lng;
+  updateSite();
+  map.setView(e.latlng,13);
+ });
+
+ map.on(L.Draw.Event.CREATED,e => {
+  drawn.clearLayers();
+  drawn.addLayer(e.layer);
+  drawnLayer = e.layer;
+  log("Custom AOI captured. Current raster calculation uses its bounding rectangle.");
+ });
+}
+
+$("base").onchange = () => {
+ Object.values(baseLayers).forEach(layer => map.removeLayer(layer));
+ baseLayers[$("base").value].addTo(map);
+};
+
+["lat","lon","radius"].forEach(id => {
+ $(id).addEventListener("change",updateSite);
+});
+
+function geometryBounds(geometry) {
+ const xs=[],ys=[];
+
+ function walk(coords) {
+  if (typeof coords[0] === "number") {
+   xs.push(coords[0]);
+   ys.push(coords[1]);
+  } else {
+   coords.forEach(walk);
+  }
+ }
+
+ walk(geometry.coordinates);
+
+ return [
+  Math.min(...xs),Math.min(...ys),
+  Math.max(...xs),Math.max(...ys)
+ ];
+}
+
+async function signedAsset(asset) {
+ const url = new URL("https://planetarycomputer.microsoft.com/api/sas/v1/sign");
+ url.searchParams.set("href",asset.href);
+
+ const response = await fetch(url);
+
+ if (!response.ok) {
+  throw new Error("Could not sign raster asset: HTTP "+response.status);
+ }
+
+ return (await response.json()).href;
+}
+
+async function findScenes(geometry) {
+ const start = $("start").value;
+ const end = $("end").value;
+
+ if (!start || !end || start > end) {
+  throw new Error("Please check monitoring dates.");
+ }
+
+ const payload = {
+  collections:["sentinel-2-l2a"],
+  intersects:geometry,
+  datetime:start+"T00:00:00Z/"+end+"T23:59:59Z",
+  limit:100,
+  query:{
+   "eo:cloud_cover":{
+    lte:Number($("cloud").value)
+   }
+  }
+ };
+
+ const response = await fetch(STAC+"/search",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify(payload)
+ });
+
+ if (!response.ok) {
+  throw new Error("Sentinel-2 STAC search failed: HTTP "+response.status);
+ }
+
+ const data = await response.json();
+
+ return (data.features || [])
+  .sort((a,b)=>new Date(a.properties.datetime)-new Date(b.properties.datetime))
+  .slice(0,Number($("maxScenes").value));
+}
+
+/*
+ * Raster processing:
+ * - Requests a small output window from the COG.
+ * - Uses the STAC item projection and raster bounding box.
+ * - Sentinel-2 reflectance is scaled by 10000.
+ *
+ * For production-grade analysis, use a reprojection-aware raster
+ * workflow and exact AOI pixel masking.
+ */
+async function calculateScene(item,geometry) {
+ const assets = item.assets;
+
+ const required = ["B04","B08","B03","B02"];
+
+ for (const band of required) {
+  if (!assets[band]) throw new Error("Missing raster band "+band);
+ }
+
+ const urls = await Promise.all(required.map(band => signedAsset(assets[band])));
+
+ const tiffs = await Promise.all(
+  urls.map(url => GeoTIFF.fromUrl(url))
+ );
+
+ const images = await Promise.all(tiffs.map(tiff => tiff.getImage()));
+
+ const bounds = images[0].getBoundingBox();
+ const bb = geometryBounds(geometry);
+
+ const x0=Math.max(bounds[0],bb[0]);
+ const y0=Math.max(bounds[1],bb[1]);
+ const x1=Math.min(bounds[2],bb[2]);
+ const y1=Math.min(bounds[3],bb[3]);
+
+ if (x0>=x1 || y0>=y1) {
+  throw new Error("Study site does not overlap the raster extent.");
+ }
+
+ const width=images[0].getWidth();
+ const height=images[0].getHeight();
+
+ const px0=Math.max(0,Math.floor((x0-bounds[0])/(bounds[2]-bounds[0])*width));
+ const px1=Math.min(width,Math.ceil((x1-bounds[0])/(bounds[2]-bounds[0])*width));
+ const py0=Math.max(0,Math.floor((bounds[3]-y1)/(bounds[3]-bounds[1])*height));
+ const py1=Math.min(height,Math.ceil((bounds[3]-y0)/(bounds[3]-bounds[1])*height));
+
+ const window=[px0,py0,px1,py1];
+ const outputWidth=256;
+ const outputHeight=Math.max(1,Math.round(256*(py1-py0)/Math.max(1,px1-px0)));
+
+ const arrays=await Promise.all(
+  images.map(image => image.readRasters({
+   window,
+   width:outputWidth,
+   height:outputHeight,
+   resampleMethod:"bilinear"
+  }))
+ );
+
+ let scl=null;
+
+ if (assets.SCL && $("cloudMask").checked) {
+  try {
+   const sclUrl=await signedAsset(assets.SCL);
+   const sclTiff=await GeoTIFF.fromUrl(sclUrl);
+   const sclImage=await sclTiff.getImage();
+
+   const sclRaster=await sclImage.readRasters({
+    window,
+    width:outputWidth,
+    height:outputHeight,
+    resampleMethod:"nearest"
+   });
+
+   scl=sclRaster[0];
+  } catch(error) {
+   console.warn("SCL unavailable:",error);
+  }
+ }
+
+ const red=arrays[0][0];
+ const nir=arrays[1][0];
+ const green=arrays[2][0];
+ const blue=arrays[3][0];
+
+ let sumNDVI=0,sumEVI=0,sumSAVI=0;
+ let valid=0,vegetated=0,bare=0,other=0;
+
+ const threshold=Number($("threshold").value);
+
+ for(let i=0;i<red.length;i++) {
+
+  // SCL: exclude no-data, defective, cloud-shadow,
+  // medium/high probability cloud, cirrus and snow.
+  if(scl && [0,1,3,8,9,10,11].includes(scl[i])) continue;
+
+  const r=red[i]/10000;
+  const n=nir[i]/10000;
+  const b=blue[i]/10000;
+
+  if (![r,n,b].every(Number.isFinite)) continue;
+  if (Math.max(r,n,b)<=0) continue;
+
+  const ndvi=(n-r)/(n+r+1e-8);
+  const evi=2.5*(n-r)/(n+6*r-7.5*b+1);
+  const savi=1.5*(n-r)/(n+r+.5);
+
+  valid++;
+  sumNDVI+=ndvi;
+  sumEVI+=evi;
+  sumSAVI+=savi;
+
+  if(ndvi>=threshold) vegetated++;
+  else if(ndvi<.05) bare++;
+  else other++;
+ }
+
+ if(!valid) {
+  throw new Error("No valid pixels after masking.");
+ }
+
+ const pixelAreaHa=0.01;
+
+ return {
+  date:item.properties.datetime.slice(0,10),
+  cloud:Number(item.properties["eo:cloud_cover"]||0),
+  meanNDVI:sumNDVI/valid,
+  meanEVI:sumEVI/valid,
+  meanSAVI:sumSAVI/valid,
+  vegetationPercent:vegetated/valid*100,
+  vegetationAreaHa:vegetated*pixelAreaHa,
+  barePercent:bare/valid*100,
+  otherPercent:other/valid*100,
+  validPixels:valid,
+  vegetatedPixels:vegetated,
+  itemId:item.id
+ };
+}
+
+async function runMonitoring() {
+ const button=$("runBtn");
+ button.disabled=true;
+ results=[];
+
+ try {
+  const geometry=drawnLayer
+   ? drawnLayer.toGeoJSON().geometry
+   : getAOI();
+
+  log("Searching Sentinel-2 imagery...");
+
+  const scenes=await findScenes(geometry);
+
+  if(!scenes.length) {
+   throw new Error("No scenes found. Increase cloud limit or extend the date range.");
+  }
+
+  log(scenes.length+" scenes found. Starting raster processing.");
+
+  for(let i=0;i<scenes.length;i++) {
+   log("Processing scene "+(i+1)+" of "+scenes.length);
+
+   try {
+    const result=await calculateScene(scenes[i],geometry);
+    results.push(result);
+    renderAnalytics();
+   } catch(error) {
+    console.warn(error);
+    log("Scene skipped: "+error.message);
+   }
+  }
+
+  results.sort((a,b)=>a.date.localeCompare(b.date));
+
+  if(!results.length) {
+   throw new Error("No scenes could be processed. Check network, COG access and AOI.");
+  }
+
+  renderAnalytics();
+  log("Completed. "+results.length+" scenes processed.");
+
+ } catch(error) {
+  log("ERROR: "+error.message);
+ } finally {
+  button.disabled=false;
+ }
+}
+
+function renderTable() {
+ $("sceneRows").innerHTML=results.length
+  ? results.map(s=>`
+   <tr>
+    <td>${s.date}</td>
+    <td>${fmt(s.cloud,1)}</td>
+    <td>${fmt(s.meanNDVI,3)}</td>
+    <td>${fmt(s.vegetationPercent,1)}%</td>
+   </tr>
+  `).join("")
+  : '<tr><td colspan="4">No processed scenes.</td></tr>';
+}
+
+function renderAnalytics() {
+ if(!results.length) return;
+
+ const first=results[0];
+ const latest=results[results.length-1];
+ const change=latest.meanNDVI-first.meanNDVI;
+
+ $("sceneCount").textContent=results.length;
+ $("meanNdvi").textContent=fmt(latest.meanNDVI);
+ $("vegArea").textContent=fmt(latest.vegetationAreaHa,2);
+ $("vegPct").textContent=fmt(latest.vegetationPercent,1)+"%";
+ $("ndviChange").textContent=(change>=0?"+":"")+fmt(change);
+ $("cloudCover").textContent=fmt(latest.cloud,1)+"%";
+
+ renderTable();
+
+ if(trendChart) trendChart.destroy();
+
+ trendChart=new Chart($("trendChart"),{
+  type:"line",
+  data:{
+   labels:results.map(s=>s.date),
+   datasets:[
+    {
+     label:"Mean NDVI",
+     data:results.map(s=>s.meanNDVI),
+     borderColor:"#69e0b0",
+     backgroundColor:"#69e0b022",
+     fill:true,
+     tension:.25
+    },
+    {
+     label:"Vegetation proportion",
+     data:results.map(s=>s.vegetationPercent/100),
+     borderColor:"#e9c875",
+     tension:.25
+    }
+   ]
+  },
+  options:{
+   responsive:true,
+   maintainAspectRatio:false,
+   plugins:{
+    legend:{labels:{color:"#b7cbbf",font:{size:9}}}
+   },
+   scales:{
+    x:{ticks:{color:"#9bb5a8",font:{size:8}},grid:{color:"#203d32"}},
+    y:{ticks:{color:"#9bb5a8",font:{size:8}},grid:{color:"#203d32"}}
+   }
+  }
+ });
+
+ if(classChart) classChart.destroy();
+
+ classChart=new Chart($("classChart"),{
+  type:"doughnut",
+  data:{
+   labels:["Vegetated","Bare / low NDVI","Other valid"],
+   datasets:[{
+    data:[
+     latest.vegetationPercent,
+     latest.barePercent,
+     latest.otherPercent
+    ],
+    backgroundColor:["#50d69a","#e77f78","#7db7ef"],
+    borderColor:"#0d211b"
+   }]
+  },
+  options:{
+   responsive:true,
+   maintainAspectRatio:false,
+   plugins:{
+    legend:{position:"bottom",labels:{color:"#b7cbbf",font:{size:9}}}
+   }
+  }
+ });
+
+ let interpretation="";
+
+ if(change>.03) {
+  interpretation="Mean NDVI increased across the selected observations. This may indicate increasing green vegetation.";
+ } else if(change<-.03) {
+  interpretation="Mean NDVI decreased across the selected observations. Investigate disturbance, seasonal vegetation, water and cloud effects.";
+ } else {
+  interpretation="Mean NDVI remained broadly stable across the selected observations.";
+ }
+
+ $("interpretation").textContent=
+  $("siteName").value+": "+results.length+
+  " Sentinel-2 observations from "+first.date+" to "+latest.date+
+  ". NDVI change: "+fmt(change)+
+  ". Latest threshold-based vegetation indicator: "+
+  fmt(latest.vegetationPercent,1)+"%. "+
+  interpretation+
+  " This is not a verified tree-survival measurement.";
+}
+
+/* Local drone image screening */
+async function screenDroneImages() {
+ const files=[...$("droneFiles").files];
+ droneResults=[];
+
+ if(!files.length) return;
+
+ log("Screening drone RGB imagery locally...");
+
+ for(const file of files) {
+  const url=URL.createObjectURL(file);
+
+  try {
+   const img=await new Promise((resolve,reject)=>{
+    const image=new Image();
+    image.onload=()=>resolve(image);
+    image.onerror=reject;
+    image.src=url;
+   });
+
+   const canvas=document.createElement("canvas");
+   canvas.width=512;
+   canvas.height=Math.max(1,Math.round(512*img.height/img.width));
+
+   const ctx=canvas.getContext("2d",{willReadFrequently:true});
+   ctx.drawImage(img,0,0,canvas.width,canvas.height);
+
+   const pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+
+   let green=0,total=0;
+
+   for(let i=0;i<pixels.length;i+=4) {
+    const r=pixels[i],g=pixels[i+1],b=pixels[i+2];
+
+    if(g>r*1.08 && g>b*1.03 && g>45) green++;
+    total++;
+   }
+
+   droneResults.push({
+    filename:file.name,
+    width:img.width,
+    height:img.height,
+    greenPixelPercent:green/total*100
+   });
+
+  } finally {
+   URL.revokeObjectURL(url);
+  }
+ }
+
+ alert(droneResults.map(item=>
+  item.filename+": "+fmt(item.greenPixelPercent,1)+
+  "% green pixels (uncalibrated screening indicator)"
+ ).join("\n"));
+
+ log("Drone RGB screening completed. This is not AI tree detection.");
+}
+
+/* Load an optional ONNX model.
+   Model inference requires model-specific preprocessing. */
+async function loadONNX() {
+ const file=$("onnxFile").files[0];
+ if(!file) return;
+
+ try {
+  const modelURL=URL.createObjectURL(file);
+
+  modelSession=await ort.InferenceSession.create(modelURL,{
+   executionProviders:["wasm"]
+  });
+
+  log(
+   "ONNX model loaded. Input: "+
+   modelSession.inputNames[0]+
+   " | Output: "+
+   modelSession.outputNames[0]+
+   ". Validate its tensor layout and preprocessing."
+  );
+
+ } catch(error) {
+  modelSession=null;
+  log("ONNX loading failed: "+error.message);
+ }
+}
+
+/* Exports */
+function exportCSV() {
+ if(!results.length) return alert("Run monitoring first.");
+
+ const keys=Object.keys(results[0]);
+
+ const csv=[
+  keys.join(","),
+  ...results.map(row=>keys.map(key=>JSON.stringify(row[key])).join(","))
+ ].join("\n");
+
+ download("Gambia_Reforestation_Scene_Statistics.csv",csv,"text/csv");
+}
+
+function exportGeoJSON() {
+ const geometry=drawnLayer
+  ? drawnLayer.toGeoJSON().geometry
+  : getAOI();
+
+ const feature={
+  type:"Feature",
+  geometry,
+  properties:{
+   site:$("siteName").value,
+   habitat:$("habitat").value,
+   restorationYear:Number($("plantYear").value),
+   monitoringStart:$("start").value,
+   monitoringEnd:$("end").value
+  }
+ };
+
+ download(
+  "Gambia_Restoration_AOI.geojson",
+  JSON.stringify({type:"FeatureCollection",features:[feature]},null,2),
+  "application/geo+json"
+ );
+}
+
+function exportProjectJSON() {
+ const project={
+  application:"Gambia Reforestation Intelligence",
+  site:$("siteName").value,
+  habitat:$("habitat").value,
+  restorationYear:Number($("plantYear").value),
+  monitoringStart:$("start").value,
+  monitoringEnd:$("end").value,
+  aoi:drawnLayer
+   ? drawnLayer.toGeoJSON().geometry
+   : getAOI(),
+  satelliteScenes:results,
+  droneImageScreening:droneResults,
+  modelLoaded:Boolean(modelSession),
+  limitations:[
+   "NDVI is a vegetation indicator, not tree survival.",
+   "No trained U-Net++ model is supplied.",
+   "No validated tree count is calculated.",
+   "No canopy height or biomass is calculated.",
+   "Vegetation area uses approximate pixel-area estimates."
+  ]
+ };
+
+ download(
+  "Gambia_Reforestation_Project.json",
+  JSON.stringify(project,null,2),
+  "application/json"
+ );
+}
+
+function exportReport() {
+ const rows=results.map(s=>`
+  <tr>
+   <td>${s.date}</td>
+   <td>${fmt(s.meanNDVI)}</td>
+   <td>${fmt(s.vegetationPercent,1)}%</td>
+   <td>${fmt(s.cloud,1)}%</td>
+  </tr>
+ `).join("");
+
+ const html=`
+ <!DOCTYPE html>
+ <html>
+ <head>
+ <meta charset="utf-8">
+ <title>Gambia Reforestation Monitoring Report</title>
+ <style>
+ body{font:15px Arial;max-width:1000px;margin:40px auto;color:#24372d}
+ h1{color:#16734d}
+ table{border-collapse:collapse;width:100%}
+ th,td{border:1px solid #ccc;padding:8px;text-align:left}
+ </style>
+ </head>
+ <body>
+ <h1>Gambia Reforestation Intelligence</h1>
+ <h2>${$("siteName").value}</h2>
+ <p>Habitat: ${$("habitat").value}</p>
+ <p>Generated: ${new Date().toISOString()}</p>
+ <h3>Satellite monitoring results</h3>
+ <table>
+ <tr><th>Date</th><th>Mean NDVI</th><th>Vegetation pixels</th><th>Cloud %</th></tr>
+ ${rows}
+ </table>
+ <h3>Interpretation limitations</h3>
+ <p>These metrics describe satellite vegetation indicators. They are not verified tree counts, tree survival rates, canopy height or biomass. Field validation is required.</p>
+ <h3>GBoS GIS / Cartography Unit</h3>
+ <p>Produced by Ansu Singhateh | Gambia Bureau of Statistics</p>
+ </body>
+ </html>`;
+
+ download("Gambia_Reforestation_Report.html",html,"text/html");
+}
+
+function resetApplication() {
+ results=[];
+ droneResults=[];
+
+ $("siteName").value="Gambia Restoration Monitoring Site";
+ $("lat").value="13.4549";
+ $("lon").value="-16.5790";
+ $("radius").value="1";
+ $("plantYear").value="2022";
+
+ $("sceneCount").textContent="0";
+
+ ["meanNdvi","vegArea","vegPct","ndviChange","cloudCover"].forEach(id=>{
+  $(id).textContent="—";
+ });
+
+ $("interpretation").textContent="Run monitoring to generate a site-level summary.";
+ $("sceneRows").innerHTML='<tr><td colspan="4">No processed scenes.</td></tr>';
+
+ if(trendChart) trendChart.destroy();
+ if(classChart) classChart.destroy();
+
+ if(drawnLayer) {
+  map.removeLayer(drawnLayer);
+  drawnLayer=null;
+ }
+
+ updateSite();
+ map.setView([13.4549,-16.5790],13);
+
+ log("Application reset.");
+}
+
+$("runBtn").onclick=runMonitoring;
+$("resetBtn").onclick=resetApplication;
+$("csvBtn").onclick=exportCSV;
+$("geoBtn").onclick=exportGeoJSON;
+$("jsonBtn").onclick=exportProjectJSON;
+$("reportBtn").onclick=exportReport;
+$("droneFiles").onchange=screenDroneImages;
+$("onnxFile").onchange=loadONNX;
+
+initMap();
+</script>
+</body>
+</html>
